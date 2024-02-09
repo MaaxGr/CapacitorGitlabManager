@@ -4,24 +4,16 @@
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <ion-list id="inbox-list">
-            <ion-list-header>Inbox</ion-list-header>
-            <ion-note>hi@ionicframework.com</ion-note>
+            <ion-list-header>Gitlab Manager</ion-list-header>
+            <ion-note>{{ userProfileStore.username }}</ion-note>
 
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
+              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none"
+                        detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
                 <ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
                 <ion-label>{{ p.title }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
-          </ion-list>
-
-          <ion-list id="labels-list">
-            <ion-list-header>Labels</ion-list-header>
-
-            <ion-item v-for="(label, index) in labels" lines="none" :key="index">
-              <ion-icon aria-hidden="true" slot="start" :ios="bookmarkOutline" :md="bookmarkSharp"></ion-icon>
-              <ion-label>{{ label }}</ion-label>
-            </ion-item>
           </ion-list>
         </ion-content>
       </ion-menu>
@@ -45,72 +37,71 @@ import {
   IonRouterOutlet,
   IonSplitPane,
 } from '@ionic/vue';
-import { ref } from 'vue';
-import {
-  archiveOutline,
-  archiveSharp,
-  bookmarkOutline,
-  bookmarkSharp,
-  heartOutline,
-  heartSharp,
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  trashOutline,
-  trashSharp,
-  warningOutline,
-  warningSharp,
-} from 'ionicons/icons';
+import {onMounted, ref} from 'vue';
+import {cogOutline, cogSharp, gitBranchOutline, gitBranchSharp, homeOutline, homeSharp} from 'ionicons/icons';
+import {useRoute} from "vue-router";
+import {useProfile, userProfileStore} from "@/composables/profile";
+import {addListeners, registerNotifications} from "@/composables/notifications";
+import {Capacitor} from "@capacitor/core";
 
+const route = useRoute()
+const profile = useProfile();
 const selectedIndex = ref(0);
+
+onMounted(async () => {
+  await profile.reloadProfile()
+
+  if (Capacitor.getPlatform() === 'android') {
+    await addListeners()
+    await registerNotifications()
+  }
+});
+
 const appPages = [
   {
-    title: 'Inbox',
-    url: '/folder/Inbox',
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    title: 'Dashboard',
+    url: '/dashboard',
+    iosIcon: homeOutline,
+    mdIcon: homeSharp,
   },
   {
-    title: 'Outbox',
-    url: '/folder/Outbox',
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
+    title: 'Assigned MRs',
+    url: '/assigned-mrs',
+    iosIcon: gitBranchOutline,
+    mdIcon: gitBranchSharp,
   },
   {
-    title: 'Favorites',
-    url: '/folder/Favorites',
-    iosIcon: heartOutline,
-    mdIcon: heartSharp,
+    title: 'Review MRs',
+    url: '/review-mrs',
+    iosIcon: gitBranchOutline,
+    mdIcon: gitBranchSharp,
   },
   {
-    title: 'Archived',
-    url: '/folder/Archived',
-    iosIcon: archiveOutline,
-    mdIcon: archiveSharp,
+    title: 'Renovate MRs',
+    url: '/renovate-mrs',
+    iosIcon: gitBranchOutline,
+    mdIcon: gitBranchSharp,
   },
   {
-    title: 'Trash',
-    url: '/folder/Trash',
-    iosIcon: trashOutline,
-    mdIcon: trashSharp,
+    title: 'Compare Branches',
+    url: '/compare-branches',
+    iosIcon: cogOutline,
+    mdIcon: cogSharp,
   },
   {
-    title: 'Spam',
-    url: '/folder/Spam',
-    iosIcon: warningOutline,
-    mdIcon: warningSharp,
-  },
+    title: 'Settings',
+    url: '/settings',
+    iosIcon: cogOutline,
+    mdIcon: cogSharp,
+  }
 ];
-const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
-const path = window.location.pathname.split('folder/')[1];
-if (path !== undefined) {
-  selectedIndex.value = appPages.findIndex((page) => page.title.toLowerCase() === path.toLowerCase());
-}
+selectedIndex.value = appPages.findIndex(p => p.url === route.path)
+
 </script>
 
 <style scoped>
+
 ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
