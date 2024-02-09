@@ -167,7 +167,8 @@ async function getCommitComparisonNullable(projectId: number, sourceBranch: stri
   if (sourceBranch == undefined || targetBranch == undefined) {
     return null
   } else {
-    return (await gitlabApi.compareBranches(projectId, sourceBranch, targetBranch)).commits.length
+    return (await gitlabApi.compareBranches(projectId, sourceBranch, targetBranch)).commits
+        .filter(it => !it.title.startsWith("Merge branch ")  ).length
   }
 }
 

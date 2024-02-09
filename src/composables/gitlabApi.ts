@@ -169,7 +169,12 @@ export function useGitlabApi() {
 }
 
 export interface BranchComparison {
-    commits: any[]
+    commits: BranchComparisonCommit[]
+}
+
+export interface BranchComparisonCommit {
+    id: string,
+    title: string
 }
 
 export interface MergeRequest {

@@ -11,5 +11,6 @@
 
 ## Commands
 
+* Start Dev-Server: `npm run dev`
 * Sync: `npm run build && npx cap sync`
 * Open: `npx cap open android`
